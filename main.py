@@ -3,32 +3,35 @@
 #    Use streamlit run main.py and ctrl + c to exit
 # 2) Utilize LangChain to create knowledge base (pdf chunking) 
 # 3) OpenAI or embedding model for embeddings
+# 4) FAISS for vectorstore
+# 5) Functions to handle user input, bot response, and conversation history
 
 import streamlit as st
-from dotenv import load_dotenv # langchain can access secrets
+from dotenv import load_dotenv  # langchain can access secrets
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings # OpenAI costs $$$!
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings  # OpenAI costs $$$!
 from langchain.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from chathtml import css, bot_template, user_template
 
+
 def get_pdf_text(pdf_docs):
     text = "" # variable to store text
     for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf) # create pdf object
-        for page in pdf_reader.pages: # loop through pdfs
-            text += page.extract_text() # add text to text
+        pdf_reader = PdfReader(pdf)  # create pdf object
+        for page in pdf_reader.pages:  # loop through pdfs
+            text += page.extract_text()  # add text to text
     return text
 
 
 def get_text_chunks(raw_text):
     text_splitter = CharacterTextSplitter(
         separator='\n',
-        chunk_size=1000,  # number of characters
-        chunk_overlap=200,
+        chunk_size=1000,  # number of characters per chunk
+        chunk_overlap=200,  # number of char to overlap between chunks
         length_function=len
     )
     chunks = text_splitter.split_text(raw_text)
@@ -62,6 +65,7 @@ def handle_userinput(user_question):
             st.write(user_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
         else:
             st.write(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
+
 
 def main():
     load_dotenv()
@@ -102,7 +106,6 @@ def main():
 
     st.write(bot_template.replace("{{MSG}}", "Hello PEPFAR member! What would you like to know?"), unsafe_allow_html=True)
 
-                
 
 if __name__ == '__main__':
     main()

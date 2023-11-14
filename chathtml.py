@@ -37,7 +37,7 @@ bot_template = '''
 user_template = '''
 <div class="chat-message user">
     <div class="avatar">
-        <img src="https://commons.wikimedia.org/wiki/File:US_CDC_logo.svg">
+        <img src="https://banner2.cleanpng.com/20180820/vzw/kisspng-portable-network-graphics-clip-art-question-mark-c-the-unanswerable-questions-orchard-hill-church-5b7b5cb3aecd99.240854201534811315716.jpg">
     </div>    
     <div class="message">{{MSG}}</div>
 </div>
