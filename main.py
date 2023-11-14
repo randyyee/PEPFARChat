@@ -48,7 +48,7 @@ def get_vectorstore(chunked_text):
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()  # Can switch language models here, ex. huggingface
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(
+    conversation_chain = ConversationalRetrievalChain.from_llm(  # Use for remembering chat history
         llm=llm,
         retriever=vectorstore.as_retriever(),
         memory=memory
