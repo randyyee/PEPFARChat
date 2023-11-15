@@ -1,10 +1,12 @@
 # Chat with PEPFAR docs.
+# Demo uses the following:
 # 1) Interface with streamlit
 #    Use streamlit run main.py and ctrl + c to exit
-# 2) Utilize LangChain to create knowledge base (pdf chunking) 
+# 2) Utilize LangChain to create knowledge base (pdf chunking)
 # 3) OpenAI or embedding model for embeddings
 # 4) FAISS for vectorstore
 # 5) Functions to handle user input, bot response, and conversation history
+
 
 import streamlit as st
 from dotenv import load_dotenv  # langchain can access secrets
@@ -16,39 +18,41 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from chathtml import css, bot_template, user_template
+from langchain.llms import HuggingFaceHub
 
 
 def get_pdf_text(pdf_docs):
-    text = "" # variable to store text
+    text = ""  # variable to store text
     for pdf in pdf_docs:
         pdf_reader = PdfReader(pdf)  # create pdf object
         for page in pdf_reader.pages:  # loop through pdfs
             text += page.extract_text()  # add text to text
     return text
 
-
+# TODO Test out different chunking parameters and methods
 def get_text_chunks(raw_text):
     text_splitter = CharacterTextSplitter(
-        separator='\n',
-        chunk_size=1000,  # number of characters per chunk
-        chunk_overlap=200,  # number of char to overlap between chunks
+        separator="\n",
+        chunk_size=1000,  # number of characters
+        chunk_overlap=200,
         length_function=len
     )
     chunks = text_splitter.split_text(raw_text)
     return chunks
 
-
+# TODO Tes out different embedding models and vector databases?
 def get_vectorstore(chunked_text):
-    #embeddings = OpenAIEmbeddings()
-    embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-xl')
-    vectorstore = FAISS.from_texts(texts=chunked_text,embedding=embeddings)
+    embeddings = OpenAIEmbeddings()
+    # embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-xl')
+    vectorstore = FAISS.from_texts(texts=chunked_text, embedding=embeddings)
     return vectorstore
 
 
 def get_conversation_chain(vectorstore):
     llm = ChatOpenAI()  # Can switch language models here, ex. huggingface
+    #llm =
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(  # Use for remembering chat history
+    conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(),
         memory=memory
@@ -79,15 +83,19 @@ def main():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
-    st.header("Chat with PEPFAR Documentation")
+    st.header("Ask PEPFAR!")
     user_question = st.text_input("Ask a question:")
     if user_question:
         handle_userinput(user_question)
 
-    st.write(user_template.replace("{{MSG}}", "Hello PEPFARbot!"), unsafe_allow_html=True)
-
     with st.sidebar:
         st.subheader("PEPFAR Documentation")
+        st.markdown(
+            "This is an app to demo a PEPFAR documentation chatbot. "
+            "Upload your pdfs in the box below then press 'Process' "
+            "After processing, you can start to ask questions in the main app area. "
+            "This demo is based on https://github.com/alejandro-ao/ask-multiple-pdfs."
+        )
         pdf_docs = st.file_uploader(
             "Upload PDFs and click Process", accept_multiple_files=True)
         if st.button("Process"):
@@ -104,9 +112,6 @@ def main():
                 # create conversation chain using memory, generate new msgs after conversation...
                 st.session_state.conversation = get_conversation_chain(vectorstore)
 
-    st.write(bot_template.replace("{{MSG}}", "Hello PEPFAR member! What would you like to know?"), unsafe_allow_html=True)
-
 
 if __name__ == '__main__':
     main()
-
