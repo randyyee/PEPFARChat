@@ -11,6 +11,7 @@
 import streamlit as st
 from dotenv import load_dotenv  # langchain can access secrets
 from PyPDF2 import PdfReader
+from langchain.document_loaders.csv_loader import CSVLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings  # OpenAI costs $$$!
 from langchain.vectorstores import FAISS
@@ -40,7 +41,7 @@ def get_text_chunks(raw_text):
     chunks = text_splitter.split_text(raw_text)
     return chunks
 
-# TODO Tes out different embedding models and vector databases?
+# TODO Test out different embedding models and vector databases?
 def get_vectorstore(chunked_text):
     embeddings = OpenAIEmbeddings()
     # embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-xl')
@@ -92,12 +93,15 @@ def main():
         st.subheader("PEPFAR Documentation")
         st.markdown(
             "This is an app to demo a PEPFAR documentation chatbot. "
-            "Upload your pdfs in the box below then press 'Process' "
+            "Upload your data below first then press 'Process' "
             "After processing, you can start to ask questions in the main app area. "
             "This demo is based on https://github.com/alejandro-ao/ask-multiple-pdfs."
         )
         pdf_docs = st.file_uploader(
-            "Upload PDFs and click Process", accept_multiple_files=True)
+            "Upload PDFs here", accept_multiple_files=True)
+        narratives = st.file_uploader(
+            "Upload Narratives (csv) here", type="csv"
+        )
         if st.button("Process"):
             with st.spinner("Processing"):
                 # get text
