@@ -75,16 +75,18 @@ with st.sidebar:
         """
         - langchain tutorials
         - streamlit tutorials
-        - https://github.com/alejandro-ao/ask-multiple-pdfs."
+        - https://github.com/alejandro-ao/ask-multiple-pdfs
         """
     )  # end of sidebar
+
+st.title("Chat with PEPFAR Documentation Using an LLM")
 
 if accept and len(selected_doc_list) > 0:  # detect if user selects anything from the document library
     # 1) Read doc
     raw_text = get_pdf_text(selected_doc_list)
 
     # 2) Chunk doc (fixed-size chunking)
-    # TODO Test out different chunking parameters and methods
+    # TODO Test out different chunking parameters and methods; contextual chunk headers for multiple documents
     text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=user_size,  # number of characters
