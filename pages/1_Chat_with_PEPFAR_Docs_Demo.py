@@ -109,6 +109,7 @@ if accept and len(selected_doc_list) > 0:  # detect if user selects anything fro
         llm = ChatOpenAI()  # Can switch language models here, ex. huggingface
     elif user_llm == "google/flan-t5-base":
         llm = HuggingFaceHub(repo_id="google/flan-t5-base")
+
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,

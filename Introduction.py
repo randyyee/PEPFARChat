@@ -10,11 +10,12 @@ st.markdown(
     """
     This is a collection of demos using generative AI with PEPFAR documentation and data. 
     The demos show how you can use generative AI for knowledge management, task automation such as writing, data analysis, etc.
-    ### Use cases
-     -    
-    ### Try out a demo from the sidebar!
-    - Chat with PEPFAR documentation (document retrieval)
-    - Use an agent to analyze MER indicators
-    - Suggest other projects
+    ### Demo use cases
+     - Chat with PEPFAR documentation (COP/ROP guidance, technical considerations, reports to Congress, MER reference guides, etc.)
+     - Evaluate protocol proposals with data management rubric
+     - Evaluate NOFO submissions with rubric
+     - Use an agent as a basic data analyst (descriptive stats, basic statistical tests, data visualization)
+     - Use LLM for MER narratives analysis
+     - Use LLM for writing (correspondence, reports, etc.)
     """
 )
