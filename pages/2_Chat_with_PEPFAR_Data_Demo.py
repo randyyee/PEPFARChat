@@ -1,6 +1,7 @@
 from langchain.callbacks import get_openai_callback
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 import re
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.huggingface_hub import HuggingFaceHub
@@ -34,7 +35,7 @@ with st.sidebar:
     st.subheader("PEPFAR Data Analysis Chatbot")
     st.markdown(
         "This is an app to demo a PEPFAR data analysis chatbot. "
-        "The default settings use a CSV agent from OpenAI ."
+        "The default settings use a CSV agent from OpenAI. "
         "Select or upload your data file (csv) then the chatbox will appear. "
         "Note: The OpenAI agent costs $ to run (though not much). "
         "Selecting OpenAI will display the tokens used as well as the cost. "

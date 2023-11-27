@@ -71,15 +71,26 @@ with st.sidebar:
     )
     accept = st.checkbox("Done!")
     st.markdown(
-        "This demo is based on:"
-        """
+        '''
+        This demo is based on:
         - langchain tutorials
         - streamlit tutorials
         - https://github.com/alejandro-ao/ask-multiple-pdfs
-        """
+        '''
     )  # end of sidebar
 
 st.title("Chat with PEPFAR Documentation")
+
+
+with st.expander("Example queries", expanded=True):
+    st.markdown(
+        '''
+        - Try asking something specific, something you can easily check...
+        - Summarize PEPFAR's 5 year strategy.
+        - What is this document's executive summary?
+        - What does the document say about data?
+        '''
+    )
 
 if accept and len(selected_doc_list) > 0:  # detect if user selects anything from the document library
     # 1) Read doc
