@@ -1,5 +1,6 @@
 # PEPFARChat
-PEPFAR Chatbot demo using OpenAI, HuggingFace, and streamlit.
+PEPFAR Chatbot demo using OpenAI, HuggingFace, and streamlit. 
+All resources provided are publicly available.
 
 1) Install requirements with
 ```
