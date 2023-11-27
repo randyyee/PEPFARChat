@@ -79,7 +79,7 @@ with st.sidebar:
         """
     )  # end of sidebar
 
-st.title("Chat with PEPFAR Documentation Using an LLM")
+st.title("Chat with PEPFAR Documentation")
 
 if accept and len(selected_doc_list) > 0:  # detect if user selects anything from the document library
     # 1) Read doc
