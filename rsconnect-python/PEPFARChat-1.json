@@ -1,0 +1,11 @@
+{
+    "https://rconnect.edav.cdc.gov/": {
+        "server_url": "https://rconnect.edav.cdc.gov/",
+        "filename": "/home/nfs/CDC/pcx5/PEPFARChat-1",
+        "app_url": "https://rconnect.edav.cdc.gov/content/e80fa41e-0752-4299-8287-2826cef37acc/",
+        "app_id": "e80fa41e-0752-4299-8287-2826cef37acc",
+        "app_guid": "e80fa41e-0752-4299-8287-2826cef37acc",
+        "title": "PEPFARChat-1",
+        "app_mode": "python-streamlit"
+    }
+}

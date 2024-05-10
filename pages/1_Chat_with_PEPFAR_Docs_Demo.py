@@ -8,17 +8,16 @@
 # 5) Functions to handle user input, bot response, and conversation history
 # TODO Final release save persistent embeddings and vectorstore
 
-
+import os
 import streamlit as st
 from dotenv import load_dotenv  # load .env so langchain can access secrets
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings  # OpenAI costs $$$!
+from langchain.embeddings import AzureOpenAIEmbeddings  # OpenAI costs $$$!
 from langchain.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import HuggingFaceHub
+from langchain.chat_models import AzureChatOpenAI
 
 
 document_library = {
@@ -63,13 +62,13 @@ with st.sidebar:
     user_overlap = st.number_input(
         "Chunk Overlap", value=200, step=100
     )
-    user_embedding = st.selectbox(
-        "Select embedding", ("openai", "hkunlp/instructor-xl")
-    )
+    # user_embedding = st.selectbox(
+    #     "Select embedding", options=("edav-api-share-text-embeding-ada-tpm100plus-v002-dfilter")
+    # )
     user_llm = st.selectbox(
-        "Select LLM", ("openai", "google/flan-t5-base")
+        "Select LLM", options=("edav-chatapp-share-gpt4-32k-tpm25kplus-v0613-dfilter", "edav-api-share-gpt35-turbo-16k-tpm25plus-v0613-dfilter")
     )
-    accept = st.checkbox("Done!")
+    accept = st.button("Ready!")
     st.markdown(
         '''
         This demo is based on:
@@ -108,18 +107,16 @@ if accept and len(selected_doc_list) > 0:  # detect if user selects anything fro
 
     # 3) Run embeddings and store in vector database
     # TODO Test out different embedding models and vector databases
-    if user_embedding == "openai":
-        embeddings = OpenAIEmbeddings()
-    elif user_embedding == "hkunlp/instructor-xl":
-        embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-xl')
+    embeddings = AzureOpenAIEmbeddings()
     vectorstore = FAISS.from_texts(texts=chunked_text, embedding=embeddings)
 
     # 4) Setup LLM
     # TODO Test out different LLMs and parameters
-    if user_llm == "openai":
-        llm = ChatOpenAI()  # Can switch language models here, ex. huggingface
-    elif user_llm == "google/flan-t5-base":
-        llm = HuggingFaceHub(repo_id="google/flan-t5-base")
+    llm = AzureChatOpenAI(
+        api_version=os.environ["AZURE_OPENAI_VERSION"],
+        azure_deployment=os.environ["AZURE_OPENAI_DEPLOYMENT"],
+        api_key=os.environ["AZURE_OPENAI_KEY"]
+    )
 
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
@@ -129,6 +126,12 @@ if accept and len(selected_doc_list) > 0:  # detect if user selects anything fro
     )
 
     # 5) Chat section
+
+    #client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+    if user_llm not in st.session_state:
+        st.session_state["openai_model"] = user_llm
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -141,17 +144,15 @@ if accept and len(selected_doc_list) > 0:  # detect if user selects anything fro
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # 5a) Call the conversation chain
-        result = conversation_chain({"question": prompt, "chat_history": [(message["role"], message["content"]) for message in st.session_state.messages]})
-        print(prompt)
-
         with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = result["answer"]
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-
-# if __name__ == '__main__':
-#     main()
+            #stream = client.chat.completions.create(
+            stream = llm.chat.completions.create(
+                model=st.session_state["openai_model"],
+                messages=[
+                    {"role": m["role"], "content": m["content"]}
+                    for m in st.session_state.messages
+                ],
+                stream=True,
+            )
+            response = st.write_stream(stream)
+        st.session_state.messages.append({"role": "assistant", "content": response})
